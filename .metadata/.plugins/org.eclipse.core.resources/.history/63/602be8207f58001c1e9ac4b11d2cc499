@@ -1,0 +1,9 @@
+package data;
+
+import java.sql.Connection;
+
+public class CreditAccountDB {
+	static private Connection myConnection;
+	static private String mySQLStatement = null;
+
+}

@@ -1,0 +1,196 @@
+package client2;
+
+import java.awt.EventQueue;
+
+import javax.swing.JFrame;
+import java.awt.FlowLayout;
+import javax.swing.JLabel;
+import javax.swing.JButton;
+import java.awt.event.ActionListener;
+import java.awt.event.ActionEvent;
+import java.awt.Font;
+import javax.swing.JTextField;
+
+import bus.Customer;
+import data.CustomerDB;
+
+import javax.swing.JTable;
+import javax.swing.JPasswordField;
+import javax.swing.JList;
+import javax.swing.JOptionPane;
+
+public class WIndowsFormsBuilder {
+
+	private JFrame frmWindowsform;
+	private JTextField textFieldCustomerID;
+	private JTextField textFieldFirstName;
+	private JTextField textFieldLastName;
+	private JTextField textFieldPIN;
+
+	/**
+	 * Launch the application.
+	 */
+	public static void main(String[] args) {
+		EventQueue.invokeLater(new Runnable() {
+			public void run() {
+				try {
+					WIndowsFormsBuilder window = new WIndowsFormsBuilder();
+					window.frmWindowsform.setVisible(true);
+				} catch (Exception e) {
+					e.printStackTrace();
+				}
+			}
+		});
+	}
+
+	/**
+	 * Create the application.
+	 */
+	public WIndowsFormsBuilder() {
+		initialize();
+	}
+
+	/**
+	 * Initialize the contents of the frame.
+	 */
+	private void initialize() {
+		frmWindowsform = new JFrame();
+		frmWindowsform.setTitle("WindowsForm");
+		frmWindowsform.setBounds(100, 100, 721, 500);
+		frmWindowsform.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+		frmWindowsform.getContentPane().setLayout(null);
+		
+		JButton btnAdd = new JButton("ADD");
+		btnAdd.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				
+				try { 
+					  String firstName = textFieldFirstName.getText(); 
+					  String lastName = textFieldLastName.getText();
+					  int id = Integer.parseInt(textFieldCustomerID.getText());
+					  int pin = Integer.parseInt(textFieldPIN.getText());
+					 
+					  Customer customer = new Customer(id,firstName,lastName,pin);
+					  
+					  int added = CustomerDB.insert(customer);
+					  
+					  if(added==1) {
+						  JOptionPane.showMessageDialog(null, "Customer added");
+			
+					  } else {
+						  JOptionPane.showMessageDialog(null, "Please enter all fields");
+					  }
+					  
+				  } catch(Exception exception) {
+					  JOptionPane.showMessageDialog(null, exception.getMessage()); 
+				  }
+				
+				
+			}
+		});
+		btnAdd.setFont(new Font("Tahoma", Font.PLAIN, 18));
+		btnAdd.setBounds(480, 29, 162, 41);
+		frmWindowsform.getContentPane().add(btnAdd);
+		
+		JButton btnUpdate = new JButton("UPDATE");
+		btnUpdate.setFont(new Font("Tahoma", Font.PLAIN, 18));
+		btnUpdate.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+			}
+		});
+		btnUpdate.setBounds(480, 188, 162, 41);
+		frmWindowsform.getContentPane().add(btnUpdate);
+		
+		JButton btnRemove = new JButton("Remove");
+		btnRemove.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+			
+				
+				try {
+					int id = Integer.parseInt(textFieldCustomerID.getText());
+					
+					int result = JOptionPane.showConfirmDialog(null, "Do you want to delete?");
+					
+					if(result == JOptionPane.YES_OPTION){
+						CustomerDB.delete(id);
+						 
+						JOptionPane.showMessageDialog(null, "Customer deleted");
+		            }
+				} catch (Exception ex) {
+					 JOptionPane.showMessageDialog(null, ex.getMessage()); 
+				}
+				
+			
+			}
+		});
+		btnRemove.setFont(new Font("Tahoma", Font.PLAIN, 18));
+		btnRemove.setBounds(480, 98, 162, 41);
+		frmWindowsform.getContentPane().add(btnRemove);
+	
+		
+		JButton btnSearch = new JButton("Search");
+		btnSearch.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+			}
+		});
+		btnSearch.setFont(new Font("Tahoma", Font.PLAIN, 18));
+		btnSearch.setBounds(480, 280, 162, 51);
+		frmWindowsform.getContentPane().add(btnSearch);
+		
+		JButton btnExit = new JButton("Exit");
+		btnExit.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				
+				System.exit(0);
+				
+			}
+		});
+		btnExit.setFont(new Font("Tahoma", Font.PLAIN, 18));
+		btnExit.setBounds(480, 376, 162, 41);
+		frmWindowsform.getContentPane().add(btnExit);
+		
+		JLabel lblNewLabel = new JLabel("Customer ID");
+		lblNewLabel.setFont(new Font("Tahoma", Font.PLAIN, 18));
+		lblNewLabel.setBounds(56, 35, 144, 25);
+		frmWindowsform.getContentPane().add(lblNewLabel);
+		
+		JLabel lblNewLabel_1 = new JLabel("First Name");
+		lblNewLabel_1.setFont(new Font("Tahoma", Font.PLAIN, 18));
+		lblNewLabel_1.setBounds(56, 99, 144, 35);
+		frmWindowsform.getContentPane().add(lblNewLabel_1);
+		
+		JLabel lblNewLabel_2 = new JLabel("Last Name");
+		lblNewLabel_2.setFont(new Font("Tahoma", Font.PLAIN, 18));
+		lblNewLabel_2.setBounds(56, 179, 96, 24);
+		frmWindowsform.getContentPane().add(lblNewLabel_2);
+		
+		JLabel lblNewLabel_3 = new JLabel("PIN");
+		lblNewLabel_3.setFont(new Font("Tahoma", Font.PLAIN, 18));
+		lblNewLabel_3.setBounds(56, 249, 49, 14);
+		frmWindowsform.getContentPane().add(lblNewLabel_3);
+		
+		textFieldCustomerID = new JTextField();
+		textFieldCustomerID.setFont(new Font("Tahoma", Font.PLAIN, 18));
+		textFieldCustomerID.setBounds(189, 30, 240, 35);
+		frmWindowsform.getContentPane().add(textFieldCustomerID);
+		textFieldCustomerID.setColumns(10);
+		
+		textFieldFirstName = new JTextField();
+		textFieldFirstName.setFont(new Font("Tahoma", Font.PLAIN, 18));
+		textFieldFirstName.setColumns(10);
+		textFieldFirstName.setBounds(189, 99, 240, 35);
+		frmWindowsform.getContentPane().add(textFieldFirstName);
+		
+		textFieldLastName = new JTextField();
+		textFieldLastName.setFont(new Font("Tahoma", Font.PLAIN, 18));
+		textFieldLastName.setColumns(10);
+		textFieldLastName.setBounds(189, 174, 240, 35);
+		frmWindowsform.getContentPane().add(textFieldLastName);
+		
+		textFieldPIN = new JTextField();
+		textFieldPIN.setFont(new Font("Tahoma", Font.PLAIN, 18));
+		textFieldPIN.setColumns(10);
+		textFieldPIN.setBounds(189, 239, 240, 35);
+		frmWindowsform.getContentPane().add(textFieldPIN);
+	}
+}

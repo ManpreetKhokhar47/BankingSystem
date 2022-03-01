@@ -1,0 +1,130 @@
+package data;
+
+import java.sql.Connection;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.sql.Statement;
+import bus.EnumAccountType;
+import bus.RaiseException;
+
+public class FortisBankDB {
+	static private Connection myConnection;
+	static private String mySQLStatement = null;	
+	static private String mySQLQuery = null;
+	static private Statement myStatemnt = null;
+	static private ResultSet myResultSet = null;
+
+
+	//Automatically generate Account Number	
+	public static int generateAccountNumber(EnumAccountType typeOfAccount) throws NumberFormatException, SQLException
+	{
+		int tempAccNo = 0;
+		myConnection = DBConnection.getConnection();
+		if(typeOfAccount == EnumAccountType.CheckingAccount)
+		{
+			mySQLQuery = "select max(accountno) from checkingaccount";
+		}
+		else if(typeOfAccount == EnumAccountType.SavingAccount)
+		{
+			mySQLQuery = "select max(accountno) from savingaccount";
+		}
+		else if(typeOfAccount == EnumAccountType.CreditAccount)
+		{
+			mySQLQuery = "select max(accountno) from creditaccount";
+		}
+		myStatemnt = myConnection.createStatement();
+		myResultSet = myStatemnt.executeQuery(mySQLQuery);
+		
+		while(myResultSet.next()) 
+		{
+			tempAccNo = myResultSet.getInt(1);
+		}
+		if(tempAccNo == 0 && typeOfAccount == EnumAccountType.CheckingAccount)
+		{
+			tempAccNo = 5000;
+		}
+		else if(tempAccNo == 0 && typeOfAccount == EnumAccountType.SavingAccount)
+		{
+			tempAccNo = 6000;
+		}
+		else if(tempAccNo == 0 && typeOfAccount == EnumAccountType.CreditAccount)
+		{
+			tempAccNo = 7000;
+		}
+		else
+		{
+			tempAccNo++;
+		}
+		
+		return tempAccNo;
+	
+	}
+
+	public static boolean withdraw(String tableName,int accountNo, double balance) throws SQLException, RaiseException
+	{
+		boolean status = false;
+		myConnection = DBConnection.getConnection();
+		
+		mySQLStatement = "update "+ tableName +" set balance = ? where accountno = ?";
+		
+		try {
+			
+			PreparedStatement withdrawstmt = myConnection.prepareStatement(mySQLStatement);
+			
+			withdrawstmt.setDouble(1, balance);
+			withdrawstmt.setInt(2, accountNo);
+		
+			int rec = withdrawstmt.executeUpdate();
+			myConnection.commit();
+				
+			if(rec > 0) {
+				status = true;
+			}
+		} catch (SQLException e) {
+			e.printStackTrace();
+		}
+		return status;
+
+	}
+	
+	public static boolean deposit(String tableName,int accountNo, double balance) throws SQLException, RaiseException
+	{
+		boolean status = false;
+		myConnection = DBConnection.getConnection();
+		
+		mySQLStatement = "update "+ tableName +" set balance = ? where accountno = ?";
+		
+		try {
+			
+			PreparedStatement withdrawstmt = myConnection.prepareStatement(mySQLStatement);
+			
+			withdrawstmt.setDouble(1, balance);
+			withdrawstmt.setInt(2, accountNo);
+		
+			int rec = withdrawstmt.executeUpdate();
+			myConnection.commit();
+				
+			if(rec > 0) {
+				status = true;
+			}
+		} catch (SQLException e) {
+			e.printStackTrace();
+		}
+		return status;
+
+	}
+
+}
+
+
+
+
+
+
+
+
+
+
+
+

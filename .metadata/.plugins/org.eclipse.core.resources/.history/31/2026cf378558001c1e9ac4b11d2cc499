@@ -1,0 +1,32 @@
+package data;
+
+import java.sql.Connection;
+import java.sql.PreparedStatement;
+import java.sql.SQLException;
+import bus.RaiseException;
+
+public class FortisBankDB {
+	static private Connection myConnection;
+	static private String mySQLStatement = null;	
+	
+	
+	
+
+
+	//Automatically generate Account Number	
+
+
+	
+}
+
+
+
+
+
+
+
+
+
+
+
+

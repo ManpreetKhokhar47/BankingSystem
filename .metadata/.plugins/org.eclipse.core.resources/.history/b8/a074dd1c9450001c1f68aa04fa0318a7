@@ -1,0 +1,278 @@
+package client;
+
+import java.io.Console;
+import java.sql.Connection;
+import java.util.ArrayList;
+import java.util.Scanner;
+
+import bus.Customer;
+import data.CustomerDB;
+import data.DBConnection;
+
+public class ConsoleApplication {
+
+	public static void main(String[] args) {
+		// TODO Auto-generated method stub
+
+		Connection connection = DBConnection.getConnection();
+
+		int choice = 0;
+		Scanner input = new Scanner(System.in);
+
+		do {
+			
+			System.out.println("\n\tMenu\n");
+			System.out.println("1 Add");
+			System.out.println("2 Update");
+			System.out.println("3 Remove");
+			System.out.println("4 Search");
+			System.out.println("5 Display All");
+			System.out.println("6 Exit");
+
+			try {
+
+				System.out.print("\nSelect option: ");
+
+				choice = input.nextInt();
+
+				if (choice < 1 || choice > 7) {
+					System.out.println("\n>>> Invalid Choice <<<");
+				} else {
+
+					switch (choice) {
+					case 1:
+						System.out.print("\nNew Customer Details\n```````````````````````````: ");
+						System.out.print("\nEnter Customer ID: ");
+						int id = input.nextInt();
+						System.out.print("\nFirst Name: ");
+
+						String firstName = input.next();
+
+						System.out.print("\nLast Name: ");
+						String lastName = input.next();
+
+						System.out.print("\nEnter your pin: ");
+						int pin = input.nextInt();
+
+						Customer cust = new Customer(id, firstName, lastName, pin);
+
+						if(Customer.add(cust) ==1)
+						{
+							System.out.print("Customer Added");
+						}
+						else
+						{
+							System.out.print("Oops..Something Went Wrong.");
+						}
+
+						break;
+
+					case 2:
+						System.out.print("\nEnter Customer ID ");
+						int dtId = input.nextInt();
+
+						Customer customer = Customer.search(dtId);
+						System.out.println(customer);
+
+						System.out.print("\nEnter Updated First Name: ");
+						String fName = input.next();
+						System.out.print("\nEnter Updated Last Name: ");
+						String lName = input.next();
+						System.out.print("\nEnter Updated sin Name: ");
+						String sin = input.next();
+
+						customer.setFirstName(fName);
+						customer.setLastName(lName);
+						customer.setPin(Integer.parseInt(sin));
+						
+						if(Customer.update(customer) ==1)
+						{
+							System.out.print("Customer Updated");
+						}
+						else
+						{
+							System.out.print("Oops..Something Went Wrong.");
+						}
+						
+
+						break;
+					case 3:
+						System.out.print("\nEnter Customer Id to delete: ");
+						int ddtId = input.nextInt();
+						if(Customer.remove(ddtId) ==1)
+						{
+							System.out.print("Customer Removed");
+						}
+						else
+						{
+							System.out.print("Oops..Something Went Wrong.");
+						}
+						
+						break;
+
+					case 4:
+						System.out.print("\nEnter Customer Id to Search: ");
+						int cidId = input.nextInt();
+						
+						System.out.println(Customer.search(cidId).toString());
+
+						break;
+
+					case 5:
+						ArrayList<Customer> allCustomer = new ArrayList<Customer>();
+						allCustomer = Customer.displayAll();
+						
+						for(Customer aCust : allCustomer)
+						{
+							System.out.println(aCust);
+						}
+						
+						break;
+					case 6:
+						System.out.print("\nThank you!");
+						input.close();
+						break;
+
+					}
+				}
+			} catch (Exception e) {
+				input.next();
+				System.out.println("Invalid input");
+			}
+
+		} while (choice != 6);
+
+	}
+}
+
+/*
+Menu
+
+1 Add
+2 Update
+3 Remove
+4 Search
+5 Display All
+6 Exit
+
+Select option: 1
+
+New Customer Details
+```````````````````````````: 
+Enter Customer ID: 104
+
+First Name: Abhijit
+
+Last Name: Waghmare
+
+Enter your pin: 4567
+Customer Added
+	Menu
+
+1 Add
+2 Update
+3 Remove
+4 Search
+5 Display All
+6 Exit
+
+Select option: 4
+
+Enter Customer Id to Search: 104
+Customer [id=104, firstName=Abhijit, lastName=Waghmare, pin=4567]
+
+	Menu
+
+1 Add
+2 Update
+3 Remove
+4 Search
+5 Display All
+6 Exit
+
+Select option: 2
+
+Enter Customer ID 104
+Customer [id=104, firstName=Abhijit, lastName=Waghmare, pin=4567]
+
+Enter Updated First Name: abhi
+
+Enter Updated Last Name: jeet
+
+Enter Updated sin Name: 5555
+Customer Updated
+	Menu
+
+1 Add
+2 Update
+3 Remove
+4 Search
+5 Display All
+6 Exit
+
+Select option: 4
+
+Enter Customer Id to Search: 104
+Customer [id=104, firstName=abhi, lastName=jeet, pin=5555]
+
+	Menu
+
+1 Add
+2 Update
+3 Remove
+4 Search
+5 Display All
+6 Exit
+
+Select option: 5
+Customer [id=101, firstName=Manpreet, lastName=Khokhar, pin=2345]
+Customer [id=102, firstName=Jaskaran, lastName=Singh, pin=2345]
+Customer [id=103, firstName=Manmeet, lastName=Singh, pin=3456]
+Customer [id=104, firstName=abhi, lastName=jeet, pin=5555]
+
+	Menu
+
+1 Add
+2 Update
+3 Remove
+4 Search
+5 Display All
+6 Exit
+
+Select option: 3
+
+Enter Customer Id to delete: 104
+Customer Updated
+	Menu
+
+1 Add
+2 Update
+3 Remove
+4 Search
+5 Display All
+6 Exit
+
+Select option: 5
+Customer [id=101, firstName=Manpreet, lastName=Khokhar, pin=2345]
+Customer [id=102, firstName=Jaskaran, lastName=Singh, pin=2345]
+Customer [id=103, firstName=Manmeet, lastName=Singh, pin=3456]
+
+	Menu
+
+1 Add
+2 Update
+3 Remove
+4 Search
+5 Display All
+6 Exit
+
+Select option: 6
+
+Thank you!
+ */
+
+
+
+
+
+

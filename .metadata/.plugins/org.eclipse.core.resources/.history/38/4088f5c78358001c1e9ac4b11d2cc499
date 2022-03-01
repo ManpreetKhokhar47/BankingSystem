@@ -1,0 +1,85 @@
+package data;
+
+import java.sql.Connection;
+import java.sql.PreparedStatement;
+import java.sql.SQLException;
+import bus.RaiseException;
+
+public class FortisBankDB {
+	static private Connection myConnection;
+	static private String mySQLStatement = null;	
+	
+	
+	
+
+
+	//Automatically generate Account Number	
+
+
+	public static boolean withdraw(String tableName,int accountNo, double balance) throws SQLException, RaiseException
+	{
+		boolean status = false;
+		myConnection = DBConnection.getConnection();
+		
+		mySQLStatement = "update "+ tableName +" set balance = ? where accountno = ?";
+		
+		try {
+			
+			PreparedStatement withdrawstmt = myConnection.prepareStatement(mySQLStatement);
+			
+			withdrawstmt.setDouble(1, balance);
+			withdrawstmt.setInt(2, accountNo);
+		
+			int rec = withdrawstmt.executeUpdate();
+			myConnection.commit();
+				
+			if(rec > 0) {
+				status = true;
+			}
+		} catch (SQLException e) {
+			e.printStackTrace();
+		}
+		return status;
+
+	}
+	
+	public static boolean deposit(String tableName,int accountNo, double balance) throws SQLException, RaiseException
+	{
+		boolean status = false;
+		myConnection = DBConnection.getConnection();
+		
+		mySQLStatement = "update "+ tableName +" set balance = ? where accountno = ?";
+		
+		try {
+			
+			PreparedStatement withdrawstmt = myConnection.prepareStatement(mySQLStatement);
+			
+			withdrawstmt.setDouble(1, balance);
+			withdrawstmt.setInt(2, accountNo);
+		
+			int rec = withdrawstmt.executeUpdate();
+			myConnection.commit();
+				
+			if(rec > 0) {
+				status = true;
+			}
+		} catch (SQLException e) {
+			e.printStackTrace();
+		}
+		return status;
+
+	}
+
+}
+
+
+
+
+
+
+
+
+
+
+
+

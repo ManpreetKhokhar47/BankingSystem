@@ -1,0 +1,327 @@
+package client;
+import java.awt.EventQueue;
+
+import javax.swing.JFrame;
+import javax.swing.JPanel;
+import javax.swing.border.EmptyBorder;
+
+import bus.*;
+import javax.swing.JLabel;
+import javax.swing.JOptionPane;
+
+import java.awt.Font;
+import javax.swing.BorderFactory;
+
+import javax.swing.JTextField;
+import javax.swing.JTextArea;
+import javax.swing.JButton;
+import java.awt.event.ActionListener;
+import java.sql.SQLException;
+import java.text.SimpleDateFormat;
+import java.util.Date;
+import java.awt.event.ActionEvent;
+
+public class OpenAccount extends JFrame {
+
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = 1L;
+	private JPanel contentPane;
+	private JTextField txtCustomerFirstName;
+	private JTextField txtPhoneNumber;
+	private JTextField txtSin;
+	private JTextField txtOpeningBalance;
+	private JTextField txtCustomerLastName;
+	private JTextArea txtAddress ;
+	private JLabel txtCustomerId;
+	private JLabel txtAccountNumber;
+	int accountNo = 0;
+	int customerId = 0;
+
+	/**
+	 * Launch the application.
+	 */
+	public static void main(String[] args) {
+		EventQueue.invokeLater(new Runnable() {
+			public void run() {
+				try {
+					OpenAccount frame = new OpenAccount();
+					frame.setVisible(true);
+				} catch (Exception e) {
+					e.printStackTrace();
+				}
+			}
+		});
+	}
+
+	/**
+	 * Create the frame.
+	 * @throws RaiseException 
+	 */
+	public OpenAccount() {
+		setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
+		setBounds(100, 100, 1000, 600);
+		contentPane = new JPanel();
+		contentPane.setBorder(new EmptyBorder(5, 5, 5, 5));
+		setContentPane(contentPane);
+		contentPane.setLayout(null);
+		
+		
+		
+		try {
+			customerId = Customer.getCustomerId();
+			accountNo = CheckingAccount.getAccountNo();
+		} catch (NumberFormatException e2) {
+			// TODO Auto-generated catch block
+			e2.printStackTrace();
+		} catch (SQLException e2) {
+			// TODO Auto-generated catch block
+			e2.printStackTrace();
+		} catch (RaiseException e1) {
+			// TODO Auto-generated catch block
+			e1.printStackTrace();
+		}
+		
+		JPanel panel = new JPanel();
+		
+		panel.setBorder(BorderFactory.createTitledBorder("Checking Account Details"));
+		
+		panel.setBounds(67, 55, 850, 450);
+		contentPane.add(panel);
+		panel.setLayout(null);
+		
+		JLabel lblAccountNumber = new JLabel("Account Number");
+		lblAccountNumber.setBounds(40, 40, 142, 25);
+		panel.add(lblAccountNumber);
+		lblAccountNumber.setFont(new Font("Tahoma", Font.PLAIN, 14));
+		
+		JLabel lblCustomerName = new JLabel("Customer First Name");
+		lblCustomerName.setFont(new Font("Tahoma", Font.PLAIN, 14));
+		lblCustomerName.setBounds(40, 160, 142, 25);
+		panel.add(lblCustomerName);
+		
+		JLabel lblPhoneNumber = new JLabel("Phone Number");
+		lblPhoneNumber.setFont(new Font("Tahoma", Font.PLAIN, 14));
+		lblPhoneNumber.setBounds(40, 220, 142, 25);
+		panel.add(lblPhoneNumber);
+		
+		JLabel lblSin = new JLabel("SIN");
+		lblSin.setFont(new Font("Tahoma", Font.PLAIN, 14));
+		lblSin.setBounds(40, 280, 142, 25);
+		panel.add(lblSin);
+		
+		JLabel lblAddress = new JLabel("Address");
+		lblAddress.setFont(new Font("Tahoma", Font.PLAIN, 14));
+		lblAddress.setBounds(453, 220, 145, 25);
+		panel.add(lblAddress);
+		
+		JLabel lblDate = new JLabel("Date");
+		lblDate.setFont(new Font("Tahoma", Font.PLAIN, 14));
+		lblDate.setBounds(453, 40, 145, 25);
+		panel.add(lblDate);
+		
+		JLabel lblOpeningBalance = new JLabel("Opening Balance");
+		lblOpeningBalance.setFont(new Font("Tahoma", Font.PLAIN, 14));
+		lblOpeningBalance.setBounds(453, 100, 145, 25);
+		panel.add(lblOpeningBalance);
+		
+		
+		
+		txtAccountNumber = new JLabel(Integer.toString(accountNo));
+		txtAccountNumber.setFont(new Font("Tahoma", Font.PLAIN, 14));
+		txtAccountNumber.setBounds(192, 40, 110, 25);
+		panel.add(txtAccountNumber);
+		
+		txtCustomerFirstName = new JTextField();
+		txtCustomerFirstName.setBounds(192, 160, 180, 25);
+		panel.add(txtCustomerFirstName);
+		txtCustomerFirstName.setColumns(10);
+		
+		txtPhoneNumber = new JTextField();
+		txtPhoneNumber.setColumns(10);
+		txtPhoneNumber.setBounds(192, 220, 180, 25);
+		panel.add(txtPhoneNumber);
+		
+		txtSin = new JTextField();
+		txtSin.setColumns(10);
+		txtSin.setBounds(192, 280, 180, 25);
+		panel.add(txtSin);
+		
+		txtOpeningBalance = new JTextField();
+		txtOpeningBalance.setColumns(10);
+		txtOpeningBalance.setBounds(608, 100, 180, 25);
+		panel.add(txtOpeningBalance);
+		
+		txtAddress = new JTextArea();
+		txtAddress.setBounds(608, 222, 180, 83);
+		panel.add(txtAddress);
+		
+		JLabel txtDate = new JLabel(new SimpleDateFormat("dd-MM-yyyy").format(new Date()));
+		txtDate.setFont(new Font("Tahoma", Font.PLAIN, 14));
+		txtDate.setBounds(608, 40, 110, 25);
+		panel.add(txtDate);
+		
+		JLabel lblCustomerId = new JLabel("Customer ID");
+		lblCustomerId.setFont(new Font("Tahoma", Font.PLAIN, 14));
+		lblCustomerId.setBounds(40, 100, 142, 25);
+		panel.add(lblCustomerId);
+		
+		
+		txtCustomerId = new JLabel(Integer.toString(customerId));
+		txtCustomerId.setFont(new Font("Tahoma", Font.PLAIN, 14));
+		txtCustomerId.setBounds(192, 100, 110, 25);
+		panel.add(txtCustomerId);
+		
+		JButton btnSave = new JButton("Save");
+		btnSave.setFont(new Font("Tahoma", Font.BOLD, 14));
+		btnSave.setBounds(100, 344, 150, 35);
+		panel.add(btnSave);
+		
+		JButton btnReset = new JButton("Reset");
+		
+		btnReset.setFont(new Font("Tahoma", Font.BOLD, 14));
+		btnReset.setBounds(350, 344, 150, 35);
+		panel.add(btnReset);
+		
+		JButton btnCancel = new JButton("Cancel");
+		btnCancel.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				dispose();
+			}
+		});
+		btnCancel.setFont(new Font("Tahoma", Font.BOLD, 14));
+		btnCancel.setBounds(600, 344, 150, 35);
+		panel.add(btnCancel);
+		
+		JLabel lblCustomerLastName = new JLabel("Customer Last Name");
+		lblCustomerLastName.setFont(new Font("Tahoma", Font.PLAIN, 14));
+		lblCustomerLastName.setBounds(453, 160, 145, 25);
+		panel.add(lblCustomerLastName);
+		
+		txtCustomerLastName = new JTextField();
+		txtCustomerLastName.setColumns(10);
+		txtCustomerLastName.setBounds(608, 160, 180, 25);
+		panel.add(txtCustomerLastName);
+		
+		JLabel lblNewLabel_1_2_1 = new JLabel("Enter Customer Information");
+		lblNewLabel_1_2_1.setFont(new Font("Tahoma", Font.BOLD, 18));
+		lblNewLabel_1_2_1.setBounds(364, 11, 270, 30);
+		contentPane.add(lblNewLabel_1_2_1);
+		
+		
+		
+		btnSave.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				
+
+				Customer aCustomer = new Customer();
+				CheckingAccount acc = new CheckingAccount();
+				boolean status = false;
+				
+				try {
+					aCustomer.setIdentificationNumber(customerId);
+					aCustomer.setFirstName(txtCustomerFirstName.getText());
+					aCustomer.setLastName(txtCustomerLastName.getText());
+					aCustomer.setPhoneNumber(txtPhoneNumber.getText());
+					aCustomer.setSin(Integer.parseInt(txtSin.getText()));
+					aCustomer.setAddress(txtAddress.getText());
+					status = true;
+				
+				} catch (RaiseException e1) {
+					JOptionPane.showMessageDialog(null, "Error : "+ e1.getMessage());
+				}
+				catch (NumberFormatException e2)
+				{
+					JOptionPane.showMessageDialog(null, "Error : "+ e2.getMessage());
+				}
+				catch(Exception e3)
+				{
+					JOptionPane.showMessageDialog(null, "Error : "+ e3.getMessage());
+				}
+
+				if(status)
+				{
+					status = false;
+					try
+					{
+							Date date = new Date();
+							java.sql.Date currDate = new java.sql.Date(date.getTime());
+							acc.setAccountNumber(accountNo);
+							acc.setIdentificationNumber(customerId);
+							acc.setOpenedDate(currDate);
+							acc.setBalance(Double.parseDouble(txtOpeningBalance.getText()));
+							status = true;
+							
+					}
+					catch(RaiseException e1)
+					{
+						JOptionPane.showMessageDialog(null, "Error : "+ e1.getMessage());				
+					}
+					catch(NumberFormatException e2)
+					{
+						JOptionPane.showMessageDialog(null, "Error : "+ e2.getMessage());
+					}
+					catch(Exception e3)
+					{
+						JOptionPane.showMessageDialog(null, "Error : "+ e3.getMessage());
+					}
+				}
+
+					try {
+						if(status)
+						{
+							if(Customer.add(aCustomer) == 1 && CheckingAccount.add(acc) == 1)
+							{
+								JOptionPane.showMessageDialog(null,"User Created Successfully");
+								
+								reset();
+								
+								
+							}
+							else
+							{
+								JOptionPane.showMessageDialog(null,"Something went wrong.");
+							}
+							
+						}
+					} catch (SQLException e1) {
+						// TODO Auto-generated catch block
+						e1.printStackTrace();
+					}
+					catch(Exception e3)
+					{
+						JOptionPane.showMessageDialog(null, "Error : "+ e3.getMessage());
+					}
+
+			}
+		});
+		
+		btnReset.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				try {
+					reset();
+				} catch (SQLException e1) {
+					// TODO Auto-generated catch block
+					e1.printStackTrace();
+				} catch (RaiseException e1) {
+					// TODO Auto-generated catch block
+					e1.printStackTrace();
+				}
+			}
+		});
+	}
+	
+		private void reset()
+			throws SQLException, RaiseException {
+		txtCustomerFirstName.setText("");
+		txtPhoneNumber.setText("");
+		txtSin.setText("");
+		txtOpeningBalance.setText("");
+		txtCustomerLastName.setText("");
+		txtAddress.setText("");
+		txtCustomerId.setText(Integer.toString(Customer.getCustomerId()));
+		txtAccountNumber.setText(Integer.toString(CheckingAccount.getAccountNo()));
+	}
+
+}

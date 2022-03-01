@@ -1,0 +1,44 @@
+package data;
+
+import java.sql.Connection;
+import java.sql.Date;
+import java.sql.PreparedStatement;
+import java.sql.SQLException;
+
+import bus.CheckingAccount;
+
+public class CheckingAccountDB {
+	static private Connection myConnection;
+	static private String mySQLStatement = null;
+	
+	// Insert Checking Account
+	
+		public static int insertCheckingAccount(CheckingAccount aNewCheckingAccount) throws SQLException  
+		{
+			myConnection = DBConnection.getConnection();		
+			mySQLStatement = "Insert into checkingaccount(accountno,customerid,balance,openingdate)  values(?,?,?,?)";
+			
+			try {
+				PreparedStatement newCheckingAcc = myConnection.prepareStatement(mySQLStatement);
+				
+				newCheckingAcc.setInt(1, aNewCheckingAccount.getAccountNumber());
+				newCheckingAcc.setInt(2, aNewCheckingAccount.getIdentificationNumber());;
+				newCheckingAcc.setDouble(3, aNewCheckingAccount.getBalance());
+				newCheckingAcc.setDate(4, (Date) aNewCheckingAccount.getOpenedDate());
+				
+				int rec = newCheckingAcc.executeUpdate();
+				myConnection.commit();
+					
+				if(rec > 0) {
+					return 1;
+				}else {
+					return 0;
+				}
+			} catch (SQLException e) {
+				e.printStackTrace();
+				return 0;
+			}
+			
+		}
+
+}

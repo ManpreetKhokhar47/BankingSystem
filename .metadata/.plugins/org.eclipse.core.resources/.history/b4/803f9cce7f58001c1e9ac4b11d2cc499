@@ -1,0 +1,493 @@
+package data;
+
+import java.sql.Connection;
+import java.sql.Date;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.sql.Statement;
+import java.util.ArrayList;
+
+import bus.Account;
+import bus.CheckingAccount;
+import bus.CreditAccount;
+import bus.Customer;
+import bus.EnumAccountType;
+import bus.EnumTransactionType;
+import bus.IBankSystem;
+import bus.RaiseException;
+import bus.SavingAccount;
+import bus.Transaction;
+
+public class FortisBankDB {
+	static private Connection myConnection;
+	static private String mySQLStatement = null;	
+	static private String mySQLQuery = null;
+	static private Statement myStatemnt = null;
+	static private ResultSet myResultSet = null;
+	static private Customer aCustomer = null;
+	static private SavingAccount savAc = null;
+	static private CreditAccount creAc = null;
+	static private CheckingAccount chkAc = null;
+	static private Transaction Trans = null;
+
+
+	//Automatically generate Account Number	
+	public static int generateAccountNumber(EnumAccountType typeOfAccount) throws NumberFormatException, SQLException
+	{
+		int tempAccNo = 0;
+		myConnection = DBConnection.getConnection();
+		if(typeOfAccount == EnumAccountType.CheckingAccount)
+		{
+			mySQLQuery = "select max(accountno) from checkingaccount";
+		}
+		else if(typeOfAccount == EnumAccountType.SavingAccount)
+		{
+			mySQLQuery = "select max(accountno) from savingaccount";
+		}
+		else if(typeOfAccount == EnumAccountType.CreditAccount)
+		{
+			mySQLQuery = "select max(accountno) from creditaccount";
+		}
+		myStatemnt = myConnection.createStatement();
+		myResultSet = myStatemnt.executeQuery(mySQLQuery);
+		
+		while(myResultSet.next()) 
+		{
+			tempAccNo = myResultSet.getInt(1);
+		}
+		if(tempAccNo == 0 && typeOfAccount == EnumAccountType.CheckingAccount)
+		{
+			tempAccNo = 5000;
+		}
+		else if(tempAccNo == 0 && typeOfAccount == EnumAccountType.SavingAccount)
+		{
+			tempAccNo = 6000;
+		}
+		else if(tempAccNo == 0 && typeOfAccount == EnumAccountType.CreditAccount)
+		{
+			tempAccNo = 7000;
+		}
+		else
+		{
+			tempAccNo++;
+		}
+		
+		return tempAccNo;
+	
+	}
+	
+	
+	
+	
+	// Insert Saving Account
+	public static int insertSavingAccount(SavingAccount savingAccount) throws SQLException  
+	{
+		myConnection = DBConnection.getConnection();		
+		mySQLStatement = "Insert into savingaccount(accountno,customerid,balance,openingdate,extrafee,interestrate,annualgain)  values(?,?,?,?,?,?,?)";
+		
+		try {
+			PreparedStatement newSavingAccount = myConnection.prepareStatement(mySQLStatement);
+			
+			newSavingAccount.setInt(1, savingAccount.getAccountNumber());
+			newSavingAccount.setInt(2, savingAccount.getIdentificationNumber());;
+			newSavingAccount.setDouble(3, savingAccount.getBalance());
+			newSavingAccount.setDate(4, (Date) savingAccount.getOpenedDate());
+			newSavingAccount.setDouble(5, savingAccount.getExtraFee());
+			newSavingAccount.setDouble(6, savingAccount.getAnnualInterestRate());
+			newSavingAccount.setDouble(7, savingAccount.getAnnunalGain());
+			
+			int rec = newSavingAccount.executeUpdate();
+			myConnection.commit();
+				
+			if(rec > 0) {
+				return 1;
+			}else {
+				return 0;
+			}
+		} catch (SQLException e) {
+			e.printStackTrace();
+			return 0;
+		}
+	}
+	
+	// Insert Credit Account
+	
+	public static int insertCreditAccount(CreditAccount creditAccount) throws SQLException  
+	{
+		myConnection = DBConnection.getConnection();		
+		mySQLStatement = "Insert into creditaccount(accountno,customerid,creditlimit,balance,openingdate)  values(?,?,?,?,?)";
+		
+		try {
+			PreparedStatement newCreditAccount = myConnection.prepareStatement(mySQLStatement);
+			
+			newCreditAccount.setInt(1, creditAccount.getAccountNumber());
+			newCreditAccount.setInt(2, creditAccount.getIdentificationNumber());
+			newCreditAccount.setDouble(3, creditAccount.getCreditLimit());
+			newCreditAccount.setDouble(4, creditAccount.getBalance());
+			newCreditAccount.setDate(5, (Date) creditAccount.getOpenedDate());
+	
+			
+			int rec = newCreditAccount.executeUpdate();
+			myConnection.commit();
+				
+			if(rec > 0) {
+				return 1;
+			}else {
+				return 0;
+			}
+		} catch (SQLException e) {
+			e.printStackTrace();
+			return 0;
+		}
+	}
+	
+	
+	
+	public static SavingAccount searchSavingAccount(int id) throws SQLException, RaiseException
+	{
+		savAc = null;
+		myConnection = DBConnection.getConnection();
+		
+		mySQLQuery = "SELECT * FROM savingaccount WHERE  accountno = " + id ;
+		
+		myStatemnt = myConnection.createStatement();
+		
+		myResultSet = myStatemnt.executeQuery(mySQLQuery);
+		
+		if(myResultSet.next()) {
+			savAc = new SavingAccount();
+			savAc.setAccountNumber(myResultSet.getInt(1) );
+			savAc.setIdentificationNumber(myResultSet.getInt(2));
+			savAc.setBalance(myResultSet.getDouble(3));
+			savAc.setOpenedDate(myResultSet.getDate(4));
+			savAc.setExtraFee(myResultSet.getDouble(5));
+			savAc.setAnnualInterestRate(myResultSet.getDouble(6));
+			savAc.setAnnunalGain(myResultSet.getDouble(7));
+		}		
+
+		return savAc;
+
+	}
+	public static CreditAccount searchCreditAccount(int id) throws SQLException, RaiseException
+	{
+		creAc = null;
+		myConnection = DBConnection.getConnection();
+		
+		mySQLQuery = "SELECT * FROM creditaccount WHERE  accountno = " + id ;
+		
+		myStatemnt = myConnection.createStatement();
+		
+		myResultSet = myStatemnt.executeQuery(mySQLQuery);
+		
+		if(myResultSet.next()) {
+			creAc = new CreditAccount();
+			creAc.setAccountNumber(myResultSet.getInt(1) );
+			creAc.setIdentificationNumber(myResultSet.getInt(2));
+			creAc.setCreditLimit(myResultSet.getDouble(3));
+			creAc.setBalance(myResultSet.getDouble(4));
+			creAc.setOpenedDate(myResultSet.getDate(5));
+		}	
+		
+		return creAc;
+
+	}
+	public static CheckingAccount searchCheackingAccount(int id) throws SQLException, RaiseException
+	{
+		chkAc = null;
+		myConnection = DBConnection.getConnection();
+		
+		mySQLQuery = "SELECT * FROM checkingaccount WHERE  accountno = " + id ;
+		
+		myStatemnt = myConnection.createStatement();
+		
+		myResultSet = myStatemnt.executeQuery(mySQLQuery);
+		
+		if(myResultSet.next()) {
+			chkAc = new CheckingAccount();
+			chkAc.setAccountNumber(myResultSet.getInt(1) );
+			chkAc.setIdentificationNumber(myResultSet.getInt(2));
+			chkAc.setBalance(myResultSet.getInt(3));
+			chkAc.setOpenedDate(myResultSet.getDate(4));
+		}	
+
+		return chkAc;
+
+	}
+	
+	public static int deleteSavingAcc(int acc ) throws SQLException {
+		myConnection = DBConnection.getConnection();
+		
+		mySQLStatement = "Delete FROM savingaccount WHERE accountno = "  + acc ;
+		
+		try {
+			myStatemnt = myConnection.createStatement();
+			int rowAffected = myStatemnt.executeUpdate(mySQLStatement);
+			
+			myConnection.commit();	
+			
+				if(rowAffected > 0) {
+					return 1;
+				}else {
+					return 0;
+				}
+		} catch (SQLException e) {
+			e.printStackTrace();
+			return 0;
+		}
+	}
+	
+	public static int deleteCreditAcc(int accno ) throws SQLException {
+		myConnection = DBConnection.getConnection();
+		
+		mySQLStatement = "Delete FROM creditaccount WHERE accountno = "  + accno  ;
+		
+		try {
+			myStatemnt = myConnection.createStatement();
+			int rowAffected = myStatemnt.executeUpdate(mySQLStatement);
+			
+			myConnection.commit();	
+			
+				if(rowAffected > 0) {
+					return 1;
+				}else {
+					return 0;
+				}
+		} catch (SQLException e) {
+			e.printStackTrace();
+			return 0;
+		}
+	}
+	
+	public static SavingAccount searchSavByCustomerId(int id) throws SQLException, RaiseException
+	{
+		
+		myConnection = DBConnection.getConnection();
+		
+		mySQLQuery = "SELECT * FROM savingaccount WHERE  customerid = " + id ;
+		
+		myStatemnt = myConnection.createStatement();
+		
+		myResultSet = myStatemnt.executeQuery(mySQLQuery);
+		
+		if(myResultSet.next()) {
+			savAc = new SavingAccount();
+			savAc.setAccountNumber(myResultSet.getInt(1) );
+			savAc.setIdentificationNumber(myResultSet.getInt(2));
+			savAc.setBalance(myResultSet.getDouble(3));
+			savAc.setOpenedDate(myResultSet.getDate(4));
+			savAc.setExtraFee(myResultSet.getDouble(5));
+			savAc.setAnnualInterestRate(myResultSet.getDouble(6));
+			savAc.setAnnunalGain(myResultSet.getDouble(7));
+		}		
+
+		return savAc;
+
+	}
+	
+	public static CreditAccount searchCreByCustomerId(int id) throws SQLException, RaiseException
+	{
+		myConnection = DBConnection.getConnection();
+		
+		mySQLQuery = "SELECT * FROM creditaccount WHERE  customerid = " + id ;
+		
+		myStatemnt = myConnection.createStatement();
+		
+		myResultSet = myStatemnt.executeQuery(mySQLQuery);
+		
+		if(myResultSet.next()) {
+			creAc = new CreditAccount();
+			creAc.setAccountNumber(myResultSet.getInt(1) );
+			creAc.setIdentificationNumber(myResultSet.getInt(2));
+			creAc.setCreditLimit(myResultSet.getDouble(3));
+			creAc.setBalance(myResultSet.getDouble(4));
+			creAc.setOpenedDate(myResultSet.getDate(5));
+		}	
+		
+		return creAc;
+
+	}
+	public static CheckingAccount searchCheByCustomerId(int id) throws SQLException, RaiseException
+	{
+		myConnection = DBConnection.getConnection();
+		
+		mySQLQuery = "SELECT * FROM checkingaccount WHERE  customerid = " + id ;
+		
+		myStatemnt = myConnection.createStatement();
+		
+		myResultSet = myStatemnt.executeQuery(mySQLQuery);
+		
+		if(myResultSet.next()) {
+			chkAc = new CheckingAccount();
+			chkAc.setAccountNumber(myResultSet.getInt(1) );
+			chkAc.setIdentificationNumber(myResultSet.getInt(2));
+			chkAc.setBalance(myResultSet.getInt(3));
+			chkAc.setOpenedDate(myResultSet.getDate(4));
+		}	
+
+		return chkAc;
+
+	}
+	
+	public static boolean withdraw(String tableName,int accountNo, double balance) throws SQLException, RaiseException
+	{
+		boolean status = false;
+		myConnection = DBConnection.getConnection();
+		
+		mySQLStatement = "update "+ tableName +" set balance = ? where accountno = ?";
+		
+		try {
+			
+			PreparedStatement withdrawstmt = myConnection.prepareStatement(mySQLStatement);
+			
+			withdrawstmt.setDouble(1, balance);
+			withdrawstmt.setInt(2, accountNo);
+		
+			int rec = withdrawstmt.executeUpdate();
+			myConnection.commit();
+				
+			if(rec > 0) {
+				status = true;
+			}
+		} catch (SQLException e) {
+			e.printStackTrace();
+		}
+		return status;
+
+	}
+	
+	public static boolean deposit(String tableName,int accountNo, double balance) throws SQLException, RaiseException
+	{
+		boolean status = false;
+		myConnection = DBConnection.getConnection();
+		
+		mySQLStatement = "update "+ tableName +" set balance = ? where accountno = ?";
+		
+		try {
+			
+			PreparedStatement withdrawstmt = myConnection.prepareStatement(mySQLStatement);
+			
+			withdrawstmt.setDouble(1, balance);
+			withdrawstmt.setInt(2, accountNo);
+		
+			int rec = withdrawstmt.executeUpdate();
+			myConnection.commit();
+				
+			if(rec > 0) {
+				status = true;
+			}
+		} catch (SQLException e) {
+			e.printStackTrace();
+		}
+		return status;
+
+	}
+	public static int generateTransId() throws NumberFormatException, SQLException
+	{
+		int tempTransId = 0;
+		myConnection = DBConnection.getConnection();
+		mySQLQuery = "select max(transactionno) from transaction";
+		myStatemnt = myConnection.createStatement();
+		myResultSet = myStatemnt.executeQuery(mySQLQuery);
+		
+		while(myResultSet.next()) 
+		{
+			tempTransId = myResultSet.getInt(1);
+		}
+		if(tempTransId == 0)
+		{
+			tempTransId = 100000;
+		}
+		else
+		{
+			tempTransId++;
+		}
+		return tempTransId;
+	
+	}
+	
+	public static int insertTransaction(Transaction newTrans) throws SQLException  
+	{
+		myConnection = DBConnection.getConnection();		
+		mySQLStatement = "Insert into transaction(transactionno,accountnumber,transactiontype,amount,description,transdate,oldbalance,newbalance) values(?,?,?,?,?,?,?,?)";
+		
+		try {
+			PreparedStatement newTransStmt = myConnection.prepareStatement(mySQLStatement);
+			
+			newTransStmt.setInt(1, newTrans.getTransactionNumber());
+			newTransStmt.setInt(2, newTrans.getAccountNo());;
+			newTransStmt.setString(3, newTrans.getTransactionType());
+			newTransStmt.setDouble(4, newTrans.getTranactionAmount());
+			newTransStmt.setString(5, newTrans.getDescription());
+			newTransStmt.setDate(6, (Date) newTrans.getTransactionDate());
+			newTransStmt.setDouble(7, newTrans.getOldBal());
+			newTransStmt.setDouble(8, newTrans.getNewBal());
+			
+			int rec = newTransStmt.executeUpdate();
+			myConnection.commit();
+				
+			if(rec > 0) {
+				return 1;
+			}else {
+				return 0;
+			}
+		} catch (SQLException e) {
+			e.printStackTrace();
+			return 0;
+		}
+		
+	}
+	
+	public static ArrayList<Transaction> getTransactionList(int id) throws SQLException, RaiseException
+	{
+		ArrayList<Transaction> transactionList = new ArrayList<Transaction>();
+		myConnection = DBConnection.getConnection();
+		
+		mySQLQuery = "SELECT * FROM transaction WHERE accountnumber = "+ id +" order by transactionno desc";
+		
+		myStatemnt = myConnection.createStatement();
+		
+		myResultSet = myStatemnt.executeQuery(mySQLQuery);
+		
+		int r = myResultSet.getFetchSize();
+		
+		while(myResultSet.next()) {
+			
+			Trans = new Transaction();
+			
+			Trans.setTransactionNumber(myResultSet.getInt(1) );
+			Trans.setAccountNo(myResultSet.getInt(2));
+			Trans.setTransactionType(myResultSet.getString(3));
+			Trans.setTranactionAmount(myResultSet.getDouble(4));
+			Trans.setDescription(myResultSet.getString(5));
+			Trans.setTransactionDate(myResultSet.getDate(6));
+			Trans.setOldBal(myResultSet.getDouble(7));
+			Trans.setNewBal(myResultSet.getDouble(8));
+			
+			transactionList.add(Trans);
+			
+		}	
+
+		return transactionList;
+
+	}
+	
+	
+
+	
+	
+	//InsertCustomer
+	
+}
+
+
+
+
+
+
+
+
+
+
+
+

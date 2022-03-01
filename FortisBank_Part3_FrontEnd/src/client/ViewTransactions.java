@@ -1,0 +1,291 @@
+package client;
+
+import java.awt.EventQueue;
+
+import javax.swing.JFrame;
+import javax.swing.JPanel;
+import javax.swing.border.EmptyBorder;
+import javax.swing.border.TitledBorder;
+import javax.swing.table.DefaultTableModel;
+
+import bus.CheckingAccount;
+import bus.CreditAccount;
+import bus.Customer;
+import bus.RaiseException;
+import bus.SavingAccount;
+import bus.Transaction;
+
+import javax.swing.JLabel;
+import javax.swing.JOptionPane;
+
+import java.awt.Font;
+import javax.swing.JButton;
+import javax.swing.JTextField;
+import javax.swing.border.EtchedBorder;
+import java.awt.Color;
+import java.awt.event.ActionListener;
+import java.sql.SQLException;
+import java.util.ArrayList;
+import java.awt.event.ActionEvent;
+import javax.swing.JTable;
+import javax.swing.JScrollPane;
+
+public class ViewTransactions extends JFrame {
+
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = 1L;
+	private JPanel contentPane;
+	private JTextField txtAccountNo;
+	private JTable table;
+
+	/**
+	 * Launch the application.
+	 */
+	public static void main(String[] args) {
+		EventQueue.invokeLater(new Runnable() {
+			public void run() {
+				try {
+					ViewTransactions frame = new ViewTransactions();
+					frame.setVisible(true);
+				} catch (Exception e) {
+					e.printStackTrace();
+				}
+			}
+		});
+	}
+
+	/**
+	 * Create the frame.
+	 */
+	public ViewTransactions() {
+		setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
+		setBounds(100, 100, 1000, 600);
+		contentPane = new JPanel();
+		contentPane.setBorder(new EmptyBorder(5, 5, 5, 5));
+		setContentPane(contentPane);
+		contentPane.setLayout(null);
+		
+		JPanel panel = new JPanel();
+		panel.setLayout(null);
+		panel.setBorder(new TitledBorder(new EtchedBorder(EtchedBorder.LOWERED, new Color(255, 255, 255), new Color(160, 160, 160)), "Account No", TitledBorder.LEADING, TitledBorder.TOP, null, new Color(0, 0, 0)));
+		panel.setBounds(73, 52, 850, 136);
+		contentPane.add(panel);
+		
+		JLabel lblAccountNo = new JLabel("Account No");
+		lblAccountNo.setFont(new Font("Tahoma", Font.PLAIN, 14));
+		lblAccountNo.setBounds(59, 34, 83, 25);
+		panel.add(lblAccountNo);
+		
+		JButton btnSearch = new JButton("Search");
+		
+		btnSearch.setFont(new Font("Tahoma", Font.BOLD, 14));
+		btnSearch.setBounds(435, 24, 150, 35);
+		panel.add(btnSearch);
+		
+		txtAccountNo = new JTextField();
+		txtAccountNo.setColumns(10);
+		txtAccountNo.setBounds(179, 34, 180, 25);
+		panel.add(txtAccountNo);
+		
+		JButton btnCancel = new JButton("Cancel");
+		
+		btnCancel.setFont(new Font("Tahoma", Font.BOLD, 14));
+		btnCancel.setBounds(640, 24, 150, 35);
+		panel.add(btnCancel);
+		
+		JLabel lblAccountHolderName = new JLabel("Account Holder Name");
+		lblAccountHolderName.setFont(new Font("Tahoma", Font.PLAIN, 14));
+		lblAccountHolderName.setBounds(59, 84, 133, 25);
+		panel.add(lblAccountHolderName);
+		
+		JLabel lblAccountNo_1_1 = new JLabel("Account Type");
+		lblAccountNo_1_1.setFont(new Font("Tahoma", Font.PLAIN, 14));
+		lblAccountNo_1_1.setBounds(435, 84, 110, 25);
+		panel.add(lblAccountNo_1_1);
+		
+		JLabel txtAccountHolderName = new JLabel("Account Holder Name");
+		txtAccountHolderName.setFont(new Font("Tahoma", Font.PLAIN, 14));
+		txtAccountHolderName.setBounds(202, 84, 133, 25);
+		panel.add(txtAccountHolderName);
+		
+		JLabel txtAccountType = new JLabel("Account Holder Name");
+		txtAccountType.setFont(new Font("Tahoma", Font.PLAIN, 14));
+		txtAccountType.setBounds(555, 84, 133, 25);
+		panel.add(txtAccountType);
+		
+		JLabel lblNewLabel_1_2_1 = new JLabel("Transaction History");
+		lblNewLabel_1_2_1.setFont(new Font("Tahoma", Font.BOLD, 18));
+		lblNewLabel_1_2_1.setBounds(404, 11, 176, 30);
+		contentPane.add(lblNewLabel_1_2_1);
+		
+		JScrollPane scrollPane = new JScrollPane();
+		scrollPane.setBounds(73, 213, 850, 337);
+		contentPane.add(scrollPane);
+
+		table = new JTable();
+
+		
+
+		scrollPane.setViewportView(table);
+		table.setEnabled(false);
+		
+		
+		btnCancel.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				dispose();
+			}
+		});
+		
+		//button search is user to search all the transactions based on account number and display in a table
+		btnSearch.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				
+				SavingAccount savAcc = new SavingAccount();
+				CreditAccount creAcc = new CreditAccount();
+				CheckingAccount cheAcc = new CheckingAccount();
+				Customer customer = new Customer();
+				boolean found = false;
+				
+				ArrayList<Transaction> transactionList = new ArrayList<Transaction>();
+				int accountNo = 0;
+				
+				if(txtAccountNo.getText().equals(""))
+				{
+					JOptionPane.showInternalMessageDialog(null, "Please enter account number");
+				}
+				else
+				{
+					try
+					{
+						accountNo = Integer.parseInt(txtAccountNo.getText());
+						savAcc.setAccountNumber(accountNo);
+						int id = savAcc.getAccountNumber();
+						savAcc = SavingAccount.search(id);
+						creAcc = CreditAccount.search(id);
+						cheAcc = CheckingAccount.search(id);
+						
+						
+						int CustomerId;
+						if(!(savAcc == null))
+						{
+							found = true;
+							
+							txtAccountType.setText("Saving Account");
+							CustomerId = savAcc.getIdentificationNumber();
+							customer = Customer.search(CustomerId);
+							
+							if(!(customer == null))
+							{
+								txtAccountHolderName.setText(customer.getFirstName() +" "+ customer.getLastName());
+							}
+							else
+							{
+								JOptionPane.showMessageDialog(null, "Customer not Found");
+							}
+						
+						}
+						
+						if(!(creAcc == null))
+						{
+							found = true;
+							
+							txtAccountType.setText("Credit Account");
+							CustomerId = creAcc.getIdentificationNumber();
+							customer = Customer.search(CustomerId);
+							
+							if(!(customer == null))
+							{
+								txtAccountHolderName.setText(customer.getFirstName() +" "+ customer.getLastName());
+							}
+							else
+							{
+								JOptionPane.showMessageDialog(null, "Customer not Found");
+							}
+						}
+						if(!(cheAcc == null))
+						{
+							found = true;
+							
+							txtAccountType.setText("Checking Account");
+							CustomerId = cheAcc.getIdentificationNumber();
+							customer = Customer.search(CustomerId);
+							
+							if(!(customer == null))
+							{
+								txtAccountHolderName.setText(customer.getFirstName() +" "+ customer.getLastName());
+							}
+							else
+							{
+								JOptionPane.showMessageDialog(null, "Customer not Found");
+							}
+							
+						}
+						
+						if(!found)
+						{
+							JOptionPane.showMessageDialog(null, "Account not found");
+							
+						}
+						
+						
+						transactionList = Transaction.selectAll(accountNo);
+						
+						DefaultTableModel model = new DefaultTableModel();
+						Object[] columnName = new Object[7];
+						
+						columnName[0] = "Transaction No";
+						columnName[1] = "Date";
+						columnName[2] = "Description";
+						columnName[3] = "Transaction Type";
+						columnName[4] = "Old Balance";
+						columnName[5] = "Amount";
+						columnName[6] = "New Balance";
+						
+						model.setColumnIdentifiers(columnName);
+						
+						
+						Object[] rowData = new Object[7];
+						
+						for(int i=0; i < transactionList.size(); i++)
+						{
+							rowData[0] = transactionList.get(i).getTransactionNumber();
+							rowData[1] = transactionList.get(i).getTransactionDate();
+							rowData[2] = transactionList.get(i).getDescription();
+							rowData[3] = transactionList.get(i).getTransactionType();
+							rowData[4] = transactionList.get(i).getOldBal();
+							rowData[5] = transactionList.get(i).getTranactionAmount();
+							rowData[6] = transactionList.get(i).getNewBal();
+							
+							model.addRow(rowData);
+											
+						}
+						
+						table.setModel(model);
+						table.getColumnModel().getColumn(0).setResizable(false);
+						table.getColumnModel().getColumn(0).setPreferredWidth(70);
+						table.getColumnModel().getColumn(1).setResizable(false);
+						table.getColumnModel().getColumn(1).setPreferredWidth(50);
+						table.getColumnModel().getColumn(2).setResizable(false);
+						table.getColumnModel().getColumn(2).setPreferredWidth(290);
+						table.getColumnModel().getColumn(3).setResizable(false);
+						table.getColumnModel().getColumn(3).setPreferredWidth(70);
+						table.getColumnModel().getColumn(4).setResizable(false);
+						table.getColumnModel().getColumn(4).setPreferredWidth(50);
+						table.getColumnModel().getColumn(5).setResizable(false);
+						table.getColumnModel().getColumn(5).setPreferredWidth(50);
+						table.getColumnModel().getColumn(6).setResizable(false);
+						table.getColumnModel().getColumn(6).setPreferredWidth(50);
+						
+					}
+					catch (RaiseException | NumberFormatException | SQLException e3 ) {
+						JOptionPane.showInternalMessageDialog(null, "Error : " + e3.getMessage());
+					}
+				}
+				
+				
+			}
+		});
+	}
+}

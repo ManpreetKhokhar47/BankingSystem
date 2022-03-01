@@ -1,0 +1,77 @@
+package client;
+
+import java.awt.BorderLayout;
+import java.awt.EventQueue;
+
+import javax.swing.JFrame;
+import javax.swing.JPanel;
+import javax.swing.border.EmptyBorder;
+import javax.swing.border.TitledBorder;
+import javax.swing.JLabel;
+import java.awt.Font;
+import javax.swing.JButton;
+import javax.swing.JTextField;
+
+public class ViewStatistics extends JFrame {
+
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = 1L;
+	private JPanel contentPane;
+	private JTextField textField;
+
+	/**
+	 * Launch the application.
+	 */
+	public static void main(String[] args) {
+		EventQueue.invokeLater(new Runnable() {
+			public void run() {
+				try {
+					ViewStatistics frame = new ViewStatistics();
+					frame.setVisible(true);
+				} catch (Exception e) {
+					e.printStackTrace();
+				}
+			}
+		});
+	}
+
+	/**
+	 * Create the frame.
+	 */
+	public ViewStatistics() {
+		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+		setBounds(100, 100, 1000, 650);
+		contentPane = new JPanel();
+		contentPane.setBorder(new EmptyBorder(5, 5, 5, 5));
+		setContentPane(contentPane);
+		contentPane.setLayout(null);
+		
+		JPanel panel = new JPanel();
+		panel.setLayout(null);
+		panel.setBorder(new TitledBorder(null, "Saving Account Details", TitledBorder.LEADING, TitledBorder.TOP, null, null));
+		panel.setBounds(10, 48, 850, 80);
+		contentPane.add(panel);
+		
+		JLabel lblCustomerId = new JLabel("Customer ID");
+		lblCustomerId.setFont(new Font("Tahoma", Font.PLAIN, 14));
+		lblCustomerId.setBounds(127, 29, 110, 25);
+		panel.add(lblCustomerId);
+		
+		JButton btnSearch = new JButton("Search");
+		btnSearch.setFont(new Font("Tahoma", Font.BOLD, 14));
+		btnSearch.setBounds(490, 24, 150, 35);
+		panel.add(btnSearch);
+		
+		textField = new JTextField();
+		textField.setColumns(10);
+		textField.setBounds(247, 29, 180, 25);
+		panel.add(textField);
+		
+		JButton btnCancel = new JButton("Cancel");
+		btnCancel.setFont(new Font("Tahoma", Font.BOLD, 14));
+		btnCancel.setBounds(650, 24, 150, 35);
+		panel.add(btnCancel);
+	}
+}

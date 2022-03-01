@@ -1,0 +1,47 @@
+package data;
+
+import java.sql.Connection;
+import java.sql.Date;
+import java.sql.PreparedStatement;
+import java.sql.SQLException;
+
+import bus.CreditAccount;
+
+public class CreditAccountDB {
+	static private Connection myConnection;
+	static private String mySQLStatement = null;
+	
+	
+	// Insert Credit Account
+	
+		public static int insertCreditAccount(CreditAccount creditAccount) throws SQLException  
+		{
+			myConnection = DBConnection.getConnection();		
+			mySQLStatement = "Insert into creditaccount(accountno,customerid,creditlimit,balance,openingdate)  values(?,?,?,?,?)";
+			
+			try {
+				PreparedStatement newCreditAccount = myConnection.prepareStatement(mySQLStatement);
+				
+				newCreditAccount.setInt(1, creditAccount.getAccountNumber());
+				newCreditAccount.setInt(2, creditAccount.getIdentificationNumber());
+				newCreditAccount.setDouble(3, creditAccount.getCreditLimit());
+				newCreditAccount.setDouble(4, creditAccount.getBalance());
+				newCreditAccount.setDate(5, (Date) creditAccount.getOpenedDate());
+		
+				
+				int rec = newCreditAccount.executeUpdate();
+				myConnection.commit();
+					
+				if(rec > 0) {
+					return 1;
+				}else {
+					return 0;
+				}
+			} catch (SQLException e) {
+				e.printStackTrace();
+				return 0;
+			}
+		}
+		
+
+}

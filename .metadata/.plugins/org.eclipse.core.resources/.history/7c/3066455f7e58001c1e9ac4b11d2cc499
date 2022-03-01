@@ -1,0 +1,43 @@
+package data;
+
+import java.sql.Connection;
+import java.sql.PreparedStatement;
+import java.sql.SQLException;
+
+import bus.Customer;
+
+public class CustomerDB {
+	
+	static private Connection myConnection;
+	static private String mySQLStatement = null;
+	// New Customer Add
+		public static int insertCustomer(Customer aNewCustomer) throws SQLException  
+		{
+			myConnection = DBConnection.getConnection();		
+			mySQLStatement = "Insert into customer(customerid,firstname,lastname,phoneno,sinno,address)  values(?,?,?,?,?,?)";
+			try {
+				PreparedStatement newCustomer = myConnection.prepareStatement(mySQLStatement);
+				
+				newCustomer.setInt(1, aNewCustomer.getIdentificationNumber());
+				newCustomer.setString(2, aNewCustomer.getFirstName());
+				newCustomer.setString(3, aNewCustomer.getLastName());
+				newCustomer.setString(4, aNewCustomer.getPhoneNumber());
+				newCustomer.setInt(5, aNewCustomer.getSin());
+				newCustomer.setString(6, aNewCustomer.getAddress());
+				
+				int rec = newCustomer.executeUpdate();
+
+		
+				if(rec > 0) {
+					return 1;
+				}else {
+					return 0;
+				}
+			} catch (SQLException e) {
+				e.printStackTrace();
+				return 0;
+			}
+			
+		}
+
+}

@@ -1,0 +1,597 @@
+package client;
+import java.awt.EventQueue;
+
+import javax.swing.JFrame;
+import javax.swing.JPanel;
+import javax.swing.border.EmptyBorder;
+import javax.swing.JLabel;
+import javax.swing.JOptionPane;
+
+import java.awt.Font;
+import javax.swing.border.TitledBorder;
+
+import bus.CheckingAccount;
+import bus.CreditAccount;
+import bus.Customer;
+import bus.EnumAccountType;
+import bus.RaiseException;
+import bus.SavingAccount;
+import bus.Transaction;
+import data.CheckingAccountDB;
+import data.CreditAccountDB;
+import data.FortisBankDB;
+
+import javax.swing.border.EtchedBorder;
+import java.awt.Color;
+import javax.swing.JButton;
+import javax.swing.JTextField;
+import java.awt.event.ActionListener;
+import java.sql.SQLException;
+import java.awt.event.ActionEvent;
+
+public class Transfer extends JFrame {
+
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = 1L;
+	private JPanel contentPane;
+	private JTextField txtSenderAccNo;
+	private JTextField txtAmount;
+	private JTextField txtReceiverAccNo;
+	private JLabel txtRecAccType;
+	private JLabel txtSenAccNo;
+	private JLabel txtSenAccType;
+	private JLabel txtSenderName;
+	private JPanel panelSender;
+	private JLabel txtSenderBalance;
+	private JPanel panelReceiver;
+	private JLabel txtRecAccNo;
+	private JLabel txtReceiverName;
+	private JLabel txtReceiverBalance;
+	
+	
+	
+	int senderCustomerId = 0;
+	int receiverCustomerId = 0;
+	Double senderBalance = 0.0;
+	Double receiverBalance = 0.0;
+	int senderAccountNo=0;
+	int receiverAccountNo=0;
+	String senderTableName = "";
+	String receiverTableName = "";
+
+	/**
+	 * Launch the application.
+	 */
+	public static void main(String[] args) {
+		EventQueue.invokeLater(new Runnable() {
+			public void run() {
+				try {
+					Transfer frame = new Transfer();
+					frame.setVisible(true);
+				} catch (Exception e) {
+					e.printStackTrace();
+				}
+			}
+		});
+	}
+
+	/**
+	 * Create the frame.
+	 */
+	public Transfer() {
+		setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
+		setBounds(100, 100, 1000, 600);
+		contentPane = new JPanel();
+		contentPane.setBorder(new EmptyBorder(5, 5, 5, 5));
+		setContentPane(contentPane);
+		contentPane.setLayout(null);
+		
+		JLabel lblNewLabel_1_2_1 = new JLabel("Transfer Money");
+		lblNewLabel_1_2_1.setFont(new Font("Tahoma", Font.BOLD, 18));
+		lblNewLabel_1_2_1.setBounds(421, 11, 142, 30);
+		contentPane.add(lblNewLabel_1_2_1);
+		
+		JPanel panel = new JPanel();
+		panel.setLayout(null);
+		panel.setBorder(new TitledBorder(new EtchedBorder(EtchedBorder.LOWERED, new Color(255, 255, 255), new Color(160, 160, 160)), "Transfer Details", TitledBorder.LEADING, TitledBorder.TOP, null, new Color(0, 0, 0)));
+		panel.setBounds(79, 52, 825, 422);
+		contentPane.add(panel);
+		
+		JLabel lblCustomerId = new JLabel("Sender Account No");
+		lblCustomerId.setFont(new Font("Tahoma", Font.PLAIN, 14));
+		lblCustomerId.setBounds(22, 33, 132, 25);
+		panel.add(lblCustomerId);
+		
+		txtSenderAccNo = new JTextField();
+		txtSenderAccNo.setColumns(10);
+		txtSenderAccNo.setBounds(164, 33, 180, 25);
+		panel.add(txtSenderAccNo);
+		
+		JButton btnSenderSearch = new JButton("Search");
+		btnSenderSearch.setFont(new Font("Tahoma", Font.BOLD, 14));
+		btnSenderSearch.setBounds(164, 69, 180, 25);
+		panel.add(btnSenderSearch);
+		
+		JLabel lblPhoneNumber = new JLabel("Amount");
+		lblPhoneNumber.setFont(new Font("Tahoma", Font.PLAIN, 14));
+		lblPhoneNumber.setBounds(152, 359, 94, 25);
+		panel.add(lblPhoneNumber);
+		
+		txtAmount = new JTextField();
+		txtAmount.setColumns(10);
+		txtAmount.setBounds(256, 359, 180, 25);
+		panel.add(txtAmount);
+		
+		JButton btnTransfer = new JButton("Transfer");
+		
+		btnTransfer.setFont(new Font("Tahoma", Font.BOLD, 14));
+		btnTransfer.setBounds(480, 359, 180, 25);
+		panel.add(btnTransfer);
+		
+		JLabel lblReceiverAccountNo = new JLabel("Receiver Account No");
+		lblReceiverAccountNo.setFont(new Font("Tahoma", Font.PLAIN, 14));
+		lblReceiverAccountNo.setBounds(384, 33, 132, 25);
+		panel.add(lblReceiverAccountNo);
+		
+		txtReceiverAccNo = new JTextField();
+		txtReceiverAccNo.setColumns(10);
+		txtReceiverAccNo.setBounds(526, 33, 180, 25);
+		panel.add(txtReceiverAccNo);
+		
+		panelSender = new JPanel();
+		panelSender.setBorder(new TitledBorder(null, "Sender Detail", TitledBorder.LEADING, TitledBorder.TOP, null, null));
+		panelSender.setBounds(22, 105, 780, 120);
+		panel.add(panelSender);
+		panelSender.setLayout(null);
+		
+		JLabel lblAccountNumber = new JLabel("Account Number");
+		lblAccountNumber.setBounds(10, 28, 104, 17);
+		panelSender.add(lblAccountNumber);
+		lblAccountNumber.setFont(new Font("Tahoma", Font.PLAIN, 14));
+		
+		txtSenAccNo = new JLabel("00");
+		txtSenAccNo.setBounds(124, 24, 110, 25);
+		panelSender.add(txtSenAccNo);
+		txtSenAccNo.setFont(new Font("Tahoma", Font.PLAIN, 14));
+		
+		JLabel lblBalance = new JLabel("Account Type");
+		lblBalance.setBounds(194, 24, 110, 25);
+		panelSender.add(lblBalance);
+		lblBalance.setFont(new Font("Tahoma", Font.PLAIN, 14));
+		
+		txtSenAccType = new JLabel("00");
+		txtSenAccType.setBounds(293, 24, 165, 25);
+		panelSender.add(txtSenAccType);
+		txtSenAccType.setFont(new Font("Tahoma", Font.PLAIN, 14));
+		
+		JLabel lblCustomerName = new JLabel("Customer Name");
+		lblCustomerName.setBounds(468, 24, 110, 25);
+		panelSender.add(lblCustomerName);
+		lblCustomerName.setFont(new Font("Tahoma", Font.PLAIN, 14));
+		
+		txtSenderName = new JLabel("Customer Name");
+		txtSenderName.setBounds(577, 24, 189, 25);
+		panelSender.add(txtSenderName);
+		txtSenderName.setFont(new Font("Tahoma", Font.PLAIN, 14));
+		
+		JLabel lblAvailableBalance = new JLabel("Available Balance");
+		lblAvailableBalance.setFont(new Font("Tahoma", Font.PLAIN, 14));
+		lblAvailableBalance.setBounds(10, 73, 104, 17);
+		panelSender.add(lblAvailableBalance);
+		
+		txtSenderBalance = new JLabel("00");
+		txtSenderBalance.setFont(new Font("Tahoma", Font.PLAIN, 14));
+		txtSenderBalance.setBounds(124, 69, 110, 25);
+		panelSender.add(txtSenderBalance);
+		
+		panelReceiver = new JPanel();
+		panelReceiver.setLayout(null);
+		panelReceiver.setBorder(new TitledBorder(new EtchedBorder(EtchedBorder.LOWERED, new Color(255, 255, 255), new Color(160, 160, 160)), "Receiver Detail", TitledBorder.LEADING, TitledBorder.TOP, null, new Color(0, 0, 0)));
+		panelReceiver.setBounds(22, 228, 780, 120);
+		panel.add(panelReceiver);
+		
+		JLabel lblAccountNumber_1 = new JLabel("Account Number");
+		lblAccountNumber_1.setFont(new Font("Tahoma", Font.PLAIN, 14));
+		lblAccountNumber_1.setBounds(10, 28, 104, 17);
+		panelReceiver.add(lblAccountNumber_1);
+		
+		txtRecAccNo = new JLabel("00");
+		txtRecAccNo.setFont(new Font("Tahoma", Font.PLAIN, 14));
+		txtRecAccNo.setBounds(124, 24, 110, 25);
+		panelReceiver.add(txtRecAccNo);
+		
+		JLabel lblBalance_1 = new JLabel("Account Type");
+		lblBalance_1.setFont(new Font("Tahoma", Font.PLAIN, 14));
+		lblBalance_1.setBounds(194, 24, 98, 25);
+		panelReceiver.add(lblBalance_1);
+		
+		txtRecAccType = new JLabel("00");
+		txtRecAccType.setFont(new Font("Tahoma", Font.PLAIN, 14));
+		txtRecAccType.setBounds(293, 24, 165, 25);
+		panelReceiver.add(txtRecAccType);
+		
+		JLabel lblCustomerName_1 = new JLabel("Customer Name");
+		lblCustomerName_1.setFont(new Font("Tahoma", Font.PLAIN, 14));
+		lblCustomerName_1.setBounds(468, 24, 110, 25);
+		panelReceiver.add(lblCustomerName_1);
+		
+		txtReceiverName = new JLabel("Customer Name");
+		txtReceiverName.setFont(new Font("Tahoma", Font.PLAIN, 14));
+		txtReceiverName.setBounds(577, 24, 189, 25);
+		panelReceiver.add(txtReceiverName);
+		
+		JLabel lblAvailableBalance_1 = new JLabel("Available Balance");
+		lblAvailableBalance_1.setFont(new Font("Tahoma", Font.PLAIN, 14));
+		lblAvailableBalance_1.setBounds(10, 68, 104, 17);
+		panelReceiver.add(lblAvailableBalance_1);
+		
+		txtReceiverBalance = new JLabel("00");
+		txtReceiverBalance.setFont(new Font("Tahoma", Font.PLAIN, 14));
+		txtReceiverBalance.setBounds(124, 64, 110, 25);
+		panelReceiver.add(txtReceiverBalance);
+		
+		JButton btnReceiverSearch = new JButton("Search");
+		
+		btnReceiverSearch.setFont(new Font("Tahoma", Font.BOLD, 14));
+		btnReceiverSearch.setBounds(526, 69, 180, 25);
+		panel.add(btnReceiverSearch);
+		
+		JButton btnReset = new JButton("Reset");
+		
+		btnReset.setFont(new Font("Tahoma", Font.BOLD, 14));
+		btnReset.setBounds(287, 504, 150, 35);
+		contentPane.add(btnReset);
+		
+		JButton btnCancel = new JButton("Cancel");
+		
+		btnCancel.setFont(new Font("Tahoma", Font.BOLD, 14));
+		btnCancel.setBounds(537, 504, 150, 35);
+		contentPane.add(btnCancel);
+		
+		btnCancel.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				dispose();
+			}
+		});
+		
+		btnSenderSearch.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				
+				SavingAccount savAcc = new SavingAccount();
+				CreditAccount creAcc = new CreditAccount();
+				CheckingAccount cheAcc = new CheckingAccount();
+				Customer customer = new Customer();
+				boolean found = false;
+				
+				
+				try
+				{
+					senderAccountNo = Integer.parseInt(txtSenderAccNo.getText());
+				}
+
+				catch (NumberFormatException e1) {
+					JOptionPane.showMessageDialog(null, "Invalid Input");
+				}
+
+				try
+				{
+					savAcc.setAccountNumber(senderAccountNo);
+					int id = savAcc.getAccountNumber();
+					savAcc = SavingAccount.search(id);
+					creAcc = CreditAccount.search(id);
+					cheAcc = CheckingAccount.search(id);
+					
+					
+					if(!(savAcc == null))
+					{
+						found = true;
+						senderTableName = (EnumAccountType.SavingAccount).toString();
+						txtSenAccNo.setText(Integer.toString(savAcc.getAccountNumber()));
+						txtSenAccType.setText("Saving Account");
+						senderCustomerId = savAcc.getIdentificationNumber();
+						senderBalance = savAcc.getBalance();
+						txtSenderBalance.setText(senderBalance.toString());
+						customer = Customer.search(senderCustomerId);
+						
+						if(!(customer == null))
+						{
+							txtSenderName.setText(customer.getFirstName() +" "+ customer.getLastName());
+						}
+						else
+						{
+							JOptionPane.showMessageDialog(null, "Customer not Found");
+						}
+					
+					}
+					
+					if(!(creAcc == null))
+					{
+						found = true;
+						senderTableName = (EnumAccountType.CreditAccount).toString();
+						txtSenAccNo.setText(Integer.toString(creAcc.getAccountNumber()));
+						txtSenAccType.setText(senderTableName);
+						senderCustomerId = creAcc.getIdentificationNumber();
+						senderBalance = creAcc.getBalance();
+						txtSenderBalance.setText(senderBalance.toString());
+						customer = Customer.search(senderCustomerId);
+						
+						if(!(customer == null))
+						{
+							txtSenderName.setText(customer.getFirstName() +" "+ customer.getLastName());
+						}
+						else
+						{
+							JOptionPane.showMessageDialog(null, "Customer not Found");
+						}
+					}
+					if(!(cheAcc == null))
+					{
+						found = true;
+						senderTableName = (EnumAccountType.CheckingAccount).toString();
+						txtSenAccNo.setText(Integer.toString(cheAcc.getAccountNumber()));
+						txtSenAccType.setText(senderTableName);
+						senderCustomerId = cheAcc.getIdentificationNumber();
+						senderBalance = cheAcc.getBalance();
+						txtSenderBalance.setText(senderBalance.toString());
+						customer = Customer.search(senderCustomerId);
+						
+						if(!(customer == null))
+						{
+							txtSenderName.setText(customer.getFirstName() +" "+ customer.getLastName());
+						}
+						else
+						{
+							JOptionPane.showMessageDialog(null, "Customer not Found");
+						}
+						
+					}
+					
+					if(!found)
+					{
+						JOptionPane.showMessageDialog(null, "Account not found");
+						
+					}
+				
+				}
+				
+				catch(Exception e3)
+				{
+					JOptionPane.showMessageDialog(null, "Error : "+ e3.getMessage());
+				}
+
+				
+			}
+
+			
+		});
+		
+		btnReceiverSearch.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				SavingAccount savAcc = new SavingAccount();
+				CreditAccount creAcc = new CreditAccount();
+				CheckingAccount cheAcc = new CheckingAccount();
+				Customer customer = new Customer();
+				boolean found = false;
+				
+				
+				try
+				{
+					receiverAccountNo = Integer.parseInt(txtReceiverAccNo.getText());
+				}
+
+				catch (NumberFormatException e1) {
+					JOptionPane.showMessageDialog(null, "Invalid Input");
+				}
+
+				try
+				{
+					savAcc.setAccountNumber(receiverAccountNo);
+					int id = savAcc.getAccountNumber();
+					savAcc = SavingAccount.search(id);
+					creAcc = CreditAccount.search(id);
+					cheAcc = CheckingAccount.search(id);
+					
+					
+					if(!(savAcc == null))
+					{
+						found = true;
+						receiverTableName = (EnumAccountType.SavingAccount).toString();
+						txtRecAccNo.setText(Integer.toString(savAcc.getAccountNumber()));
+						txtRecAccType.setText("Saving Account");
+						receiverCustomerId = savAcc.getIdentificationNumber();
+						receiverBalance = savAcc.getBalance();
+						txtReceiverBalance.setText(receiverBalance.toString());
+						customer = Customer.search(receiverCustomerId);
+						
+						if(!(customer == null))
+						{
+							txtReceiverName.setText(customer.getFirstName() +" "+ customer.getLastName());
+						}
+						else
+						{
+							JOptionPane.showMessageDialog(null, "Customer not Found");
+						}
+					
+					}
+					
+					if(!(creAcc == null))
+					{
+						found = true;
+						receiverTableName = (EnumAccountType.CreditAccount).toString();
+						txtRecAccNo.setText(Integer.toString(creAcc.getAccountNumber()));
+						txtRecAccType.setText(receiverTableName);
+						receiverCustomerId = creAcc.getIdentificationNumber();
+						receiverBalance = creAcc.getBalance();
+						txtReceiverBalance.setText(receiverBalance.toString());
+						customer = Customer.search(receiverCustomerId);
+						
+						if(!(customer == null))
+						{
+							txtReceiverName.setText(customer.getFirstName() +" "+ customer.getLastName());
+						}
+						else
+						{
+							JOptionPane.showMessageDialog(null, "Customer not Found");
+						}
+					}
+					if(!(cheAcc == null))
+					{
+						found = true;
+						receiverTableName = (EnumAccountType.CheckingAccount).toString();
+						txtRecAccNo.setText(Integer.toString(cheAcc.getAccountNumber()));
+						txtRecAccType.setText(receiverTableName);
+						receiverCustomerId = cheAcc.getIdentificationNumber();
+						receiverBalance = cheAcc.getBalance();
+						txtReceiverBalance.setText(receiverBalance.toString());
+						customer = Customer.search(receiverCustomerId);
+						
+						if(!(customer == null))
+						{
+							txtReceiverName.setText(customer.getFirstName() +" "+ customer.getLastName());
+						}
+						else
+						{
+							JOptionPane.showMessageDialog(null, "Customer not Found");
+						}
+						
+					}
+					
+					if(!found)
+					{
+						JOptionPane.showMessageDialog(null, "Account not found");
+						
+					}
+				
+				}
+				
+				catch(Exception e3)
+				{
+					JOptionPane.showMessageDialog(null, "Error : "+ e3.getMessage());
+				}
+			}
+		});
+		
+		btnTransfer.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				double amount = 0.0;
+				
+				
+				try
+				{
+					amount = Double.parseDouble(txtAmount.getText());
+					if(senderBalance < amount)
+					{
+						JOptionPane.showMessageDialog(null, "Amount must be less than Balance");
+					}
+					else
+					{
+						try {
+							boolean senderStatus = false;
+							boolean receiverStatus = false;
+							if(senderTableName.equals("CheckingAccount"))
+							{
+								CheckingAccountDB.withdraw(senderAccountNo,(senderBalance-amount));
+								senderStatus = true;
+							}
+							if(senderTableName.equals("CreditAccount"))
+							{
+								CreditAccountDB.withdraw(senderAccountNo,(senderBalance-amount));
+								senderStatus = true;
+							}
+							if(senderTableName.equals("SavingAccount"))
+							{
+								CreditAccountDB.withdraw(senderAccountNo,(senderBalance-amount));
+								senderStatus = true;
+							}
+							if(FortisBankDB.withdraw(senderTableName, senderAccountNo, (senderBalance-amount)))
+							{
+								if(FortisBankDB.deposit(receiverTableName, receiverAccountNo, (receiverBalance+amount)))
+								{
+									double senderOldBal = senderBalance;
+									double senderNewBal = senderBalance-amount;
+
+									Transaction trans = null;
+									trans = new Transaction();
+
+									trans.setTransactionNumber(Transaction.getTransactionNo());
+									trans.setAccountNo(senderAccountNo);
+									trans.setTransactionType("Debit");
+									trans.setTranactionAmount(amount);
+									trans.setDescription("Transfer to : "+ txtReceiverName.getText() +" (A/c No : "+ Integer.toString(receiverAccountNo)+" )");
+									trans.setTransactionDate(new java.sql.Date(new java.util.Date().getTime()));
+									trans.setOldBal(senderOldBal);
+									trans.setNewBal(senderNewBal);
+									
+									Transaction.add(trans);
+									
+									double recOldBal = receiverBalance;
+									double recNewBal = receiverBalance+amount;
+									
+									Transaction trans1 = null;
+									trans1 = new Transaction();
+									
+									trans1.setTransactionNumber(Transaction.getTransactionNo());
+									trans1.setAccountNo(receiverAccountNo);
+									trans1.setTransactionType("Credit");
+									trans1.setTranactionAmount(amount);
+									trans1.setDescription("Received from : " +txtSenderName.getText());
+									trans1.setTransactionDate(new java.sql.Date(new java.util.Date().getTime()));
+									trans1.setOldBal(recOldBal);
+									trans1.setNewBal(recNewBal);
+									
+									Transaction.add(trans1);
+
+									JOptionPane.showMessageDialog(null, "Transaction Complete");
+									reset();
+								}
+								
+							}
+						} catch (SQLException | RaiseException e1) 
+						{
+							JOptionPane.showMessageDialog(null, "Something Went Wrong.");
+						}
+					}
+				}
+				catch (NumberFormatException e4) {
+					JOptionPane.showMessageDialog(null, "Invalid Input : Enter Ammount");
+				}
+
+			}
+		});
+		btnReset.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				try {
+					reset();
+				} catch (SQLException | RaiseException e1) {
+					// TODO Auto-generated catch block
+					e1.printStackTrace();
+				}
+			}
+		});
+	}
+	
+	private void reset()
+			throws SQLException, RaiseException {
+		txtSenderAccNo.setText("");
+		txtReceiverAccNo.setText("");
+		
+		txtSenAccNo.setText("00");
+		txtSenAccType.setText("Undefined");
+		txtSenderName.setText("Undefined");
+		txtSenderBalance.setText("00");
+		txtRecAccNo.setText("00");
+		txtRecAccType.setText("Undefined");
+		txtReceiverName.setText("Undefined");
+		txtReceiverBalance.setText("00");
+		
+		
+		
+		txtAmount.setText("");
+	
+
+		
+	}
+	
+}

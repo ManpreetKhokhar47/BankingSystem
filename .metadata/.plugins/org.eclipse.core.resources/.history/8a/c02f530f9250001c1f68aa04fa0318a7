@@ -1,0 +1,91 @@
+package bus;
+
+import java.sql.SQLException;
+import java.util.ArrayList;
+
+import data.CustomerDB;
+import data.DepartmentDB;
+
+public class Customer {
+
+	private int id;
+	private String firstName;
+	private String lastName;
+	private int pin;
+		
+	
+
+	public int getId() {
+		return id;
+	}
+
+	public void setId(int id) {
+		this.id = id;
+	}
+
+	public String getFirstName() {
+		return firstName;
+	}
+
+	public void setFirstName(String firstName) {
+		this.firstName = firstName;
+	}
+
+	public String getLastName() {
+		return lastName;
+	}
+
+	public void setLastName(String lastName) {
+		this.lastName = lastName;
+	}
+
+	public int getPin() {
+		return pin;
+	}
+
+	public void setPin(int pin) {
+		this.pin = pin;
+	}
+
+	public Customer() {
+		super();
+	}
+
+	public Customer(int id, String firstName, String lastName, int pin) {
+		super();
+		this.id = id;
+		this.firstName = firstName;
+		this.lastName = lastName;
+		this.pin = pin;
+	}
+	
+	@Override
+	public String toString() {
+		return "Customer [id=" + id + ", firstName=" + firstName + ", lastName=" + lastName + ", pin=" + pin + "]";
+	}
+
+	public static int add(Customer element) throws SQLException {
+		return CustomerDB.insert(element);
+	}
+	
+	public static int update(Customer element) throws SQLException {
+		return CustomerDB.update(element);
+	}
+	
+	public static int remove(int id) throws SQLException {
+		return CustomerDB.delete(id);
+	}
+	
+	public static Customer search(int id) throws SQLException, SQLException {
+		return CustomerDB.search(id);
+	}
+	public static Customer displayAll() throws SQLException, SQLException {
+		return CustomerDB.displayAll();
+	}
+	
+	public static ArrayList<Customer> getData() throws SQLException, SQLException {
+		return CustomerDB.select();
+	}
+
+
+}
