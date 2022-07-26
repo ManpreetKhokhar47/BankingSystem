@@ -1,1 +1,0 @@
-typeSearchIndex = [{"l":"All Classes","u":"allclasses-index.html"},{"p":"client","l":"Dashboard"},{"p":"client","l":"Deposit"},{"p":"client","l":"LoginForm"},{"p":"client","l":"Transfer"},{"p":"client","l":"ViewAccountInformation"},{"p":"client","l":"ViewStatistics"},{"p":"client","l":"ViewTransactions"},{"p":"client","l":"Withdraw"}];updateSearchResults();
